@@ -1,21 +1,64 @@
 package tech.mistermel.discordlinker.discord;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.message.MessageCreateEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.security.auth.login.LoginException;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+import tech.mistermel.discordlinker.DiscordLinker;
 
 public class DiscordHandler {
 	
-	public void connectBot(String token) {
-		DiscordClient client = DiscordClient.create(token);
+	private JDA jda;
+	private Map<Guild, TextChannel> verifyChannels = new HashMap<>();
+	
+	public boolean connectBot(String token) {
+		try {
+			this.jda = JDABuilder.createDefault(token)
+					.build();
+			
+			jda.awaitReady();
+			return true;
+		} catch (LoginException | InterruptedException e) {
+			DiscordLinker.instance().getLogger().severe("Failed to log in to Discord: " + e.getMessage());
+			return false;
+		}
+	}
+	
+	public void createVerifyChannel(String name) {
+		MessageEmbed embed = new EmbedBuilder()
+				.setTitle("Verify your Minecraft account")
+				.appendDescription("In order to continue, you need to link your Minecraft account to your Discord account. Click on the checkmark below to continue.")
+				.build();
 		
-		GatewayDiscordClient gateway = client.login().doOnError(error -> {
-			System.out.println("Failed to log in");
-		}).block();
-		
-		gateway.on(MessageCreateEvent.class).subscribe(event -> {
-			System.out.println(event.getMessage().getContent());
-		});
+		for(Guild guild : jda.getGuilds()) {
+			List<TextChannel> channels = guild.getTextChannelsByName(name, false);
+			
+			if(channels.size() != 0) {
+				verifyChannels.put(guild, channels.get(0));
+				continue;
+			}
+			
+			TextChannel channel = guild.createTextChannel(name).complete();
+			verifyChannels.put(guild, channel);
+			
+			Message msg = channel.sendMessage(embed).complete();
+			msg.addReaction("✅").complete();
+		}
+	}
+	
+	public void disconnectBot() {
+		if(jda != null) {
+			jda.shutdown();
+		}
 	}
 	
 }
