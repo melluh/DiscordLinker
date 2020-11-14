@@ -1,0 +1,4 @@
+name: DiscordLinker
+author: MisterMel
+version: ${project.version}
+main: tech.mistermel.discordlinker.DiscordLinker
