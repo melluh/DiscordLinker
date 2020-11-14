@@ -9,8 +9,6 @@ public class DiscordListener extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-		System.out.println("GuildMessageReactionAddEvent");
-		
 		if(!event.getReaction().getReactionEmote().getAsCodepoints().equals(DiscordHandler.VERIFY_REACTION_CODEPOINT)) {
 			return;
 		}
@@ -21,8 +19,10 @@ public class DiscordListener extends ListenerAdapter {
 		
 		event.retrieveMessage().complete().removeReaction(DiscordHandler.VERIFY_REACTION, event.getUser()).complete();
 		
+		int code = DiscordLinker.instance().generateVerifyCode(event.getGuild().getIdLong(), event.getUserIdLong());
+		
 		PrivateChannel channel = event.getUser().openPrivateChannel().complete();
-		channel.sendMessage("you reacted bro").complete();
+		channel.sendMessage("Use **/verify " + code + "** in-game").complete();
 	}
 	
 }
