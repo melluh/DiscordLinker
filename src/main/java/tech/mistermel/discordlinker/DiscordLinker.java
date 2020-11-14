@@ -35,4 +35,8 @@ public class DiscordLinker extends JavaPlugin {
 		discordHandler.disconnectBot();
 	}
 	
+	public DiscordHandler getDiscordHandler() {
+		return discordHandler;
+	}
+	
 }

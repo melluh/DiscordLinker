@@ -17,13 +17,20 @@ import tech.mistermel.discordlinker.DiscordLinker;
 
 public class DiscordHandler {
 	
+	public static final String VERIFY_REACTION = "\u2705", VERIFY_REACTION_CODEPOINT = "U+2705";
+	
 	private JDA jda;
 	private Map<Guild, TextChannel> verifyChannels = new HashMap<>();
+	
+	private DiscordListener listener;
 	
 	public boolean connectBot(String token) {
 		try {
 			this.jda = JDABuilder.createDefault(token)
 					.build();
+			
+			this.listener = new DiscordListener();
+			jda.addEventListener(listener);
 			
 			jda.awaitReady();
 			return true;
@@ -51,14 +58,19 @@ public class DiscordHandler {
 			verifyChannels.put(guild, channel);
 			
 			Message msg = channel.sendMessage(embed).complete();
-			msg.addReaction("✅").complete();
+			msg.addReaction(VERIFY_REACTION).complete();
 		}
 	}
 	
 	public void disconnectBot() {
 		if(jda != null) {
+			jda.removeEventListener(listener);
 			jda.shutdown();
 		}
+	}
+	
+	public boolean isVerifyChannel(TextChannel channel) {
+		return channel.equals(verifyChannels.get(channel.getGuild()));
 	}
 	
 }
