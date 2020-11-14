@@ -67,5 +67,10 @@
 			<artifactId>JDA</artifactId>
 			<version>4.2.0_215</version>
 		</dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>3.4.5</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -1,2 +1,9 @@
 token: "<ENTER YOUR TOKEN HERE>"
 verify-channel: "verify-mc"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  database: "minecraft"
+  username: "<ENTER YOUR MYSQL USERNAME HERE>"
+  password: "<ENTER YOUR MYSQL PASSWORD HERE>"
